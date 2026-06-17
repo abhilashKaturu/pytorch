@@ -153,6 +153,7 @@ ROCM_BUILD_ENV_STATIC: dict[str, str] = {
     "USE_STATIC_NCCL": "1",
     "ATEN_STATIC_CUDA": "1",
     "USE_CUDA_STATIC_LINK": "1",
+    "BUILD_TEST": "0",
     "INSTALL_TEST": "0",
     "FORCE_RPATH": "--force-rpath",
 }
