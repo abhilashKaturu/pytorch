@@ -192,7 +192,9 @@ class NCCLPeerAllocInfo : public c10::intrusive_ptr_target {
     // for the data sub-region: only the base pointer (returned by
     // ncclMemAlloc, already granularity-aligned) is registered.
     const size_t aligned_buffer_size = at::round_up(buffer_size_, 16UL);
-    const size_t total_size = buffer_offset_ + aligned_buffer_size;
+    const size_t total_size = at::round_up(
+        buffer_offset_ + aligned_buffer_size,
+        static_cast<size_t>(NCCL_WIN_REQUIRED_ALIGNMENT));
     C10D_NCCL_CHECK(
       ncclCommWindowRegister(comm_, allocation->alloc_base, total_size, &combined_win_, NCCL_WIN_COLL_SYMMETRIC),
       c10::str(
@@ -506,7 +508,9 @@ class NCCLSymmetricMemoryAllocator : public SymmetricMemoryAllocator {
     const size_t buffer_offset =
         at::round_up(get_signal_pad_size(), signal_pad_alignment);
     const size_t aligned_buffer_size = at::round_up(size, 16UL);
-    const size_t total_size = buffer_offset + aligned_buffer_size;
+    const size_t total_size = at::round_up(
+        buffer_offset + aligned_buffer_size,
+        static_cast<size_t>(NCCL_WIN_REQUIRED_ALIGNMENT));
     void* alloc_base;
     C10D_NCCL_CHECK(ncclMemAlloc(&alloc_base, total_size), "ncclMemAlloc");
     // ncclMemAlloc does not zero memory. Zero the signal pad (the first
